@@ -7,6 +7,12 @@ Unity implementation of [CosyVoice3](https://github.com/FunAudioLLM/CosyVoice) t
 
 **Language**: [日本語](README.md) | [中文](README_CN.md)
 
+## Demo Video
+
+[![uCosyVoice Demo](https://img.youtube.com/vi/uXbTALX16FE/maxresdefault.jpg)](https://youtu.be/uXbTALX16FE)
+
+▶️ Click to watch on YouTube
+
 ## Features
 
 - **Full TTS Pipeline**: Text normalization → BPE tokenization → LLM → Flow Matching → HiFT vocoder

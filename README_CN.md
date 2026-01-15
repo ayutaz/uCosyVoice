@@ -7,6 +7,12 @@
 
 **语言**: [日本語](README.md) | [English](README_EN.md)
 
+## 演示视频
+
+[![uCosyVoice Demo](https://img.youtube.com/vi/uXbTALX16FE/maxresdefault.jpg)](https://youtu.be/uXbTALX16FE)
+
+▶️ 点击在YouTube上观看
+
 ## 特性
 
 - **完整的TTS流水线**：文本规范化 → BPE分词 → LLM → Flow Matching → HiFT声码器

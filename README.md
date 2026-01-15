@@ -7,6 +7,12 @@
 
 **言語 / Language**: [English](README_EN.md) | [中文](README_CN.md)
 
+## デモ動画
+
+[![uCosyVoice Demo](https://img.youtube.com/vi/uXbTALX16FE/maxresdefault.jpg)](https://youtu.be/uXbTALX16FE)
+
+▶️ クリックしてYouTubeで視聴
+
 ## 特徴
 
 - **完全なTTSパイプライン**: テキスト正規化 → BPEトークン化 → LLM → Flow Matching → HiFTボコーダー
