@@ -189,11 +189,15 @@ namespace uCosyVoice.Inference
                 _estimatorWorker.SetInput("cond", condsBatch);
                 _estimatorWorker.Schedule();
 
-                var velocity = _estimatorWorker.PeekOutput() as Tensor<float>;
-                velocity.ReadbackAndClone();
+                // Must dispose velocity tensor after copying data
+                float[] vData;
+                using (var velocity = _estimatorWorker.PeekOutput() as Tensor<float>)
+                {
+                    velocity.ReadbackAndClone();
+                    vData = velocity.DownloadToArray();
+                }
 
-                // Download velocity and update x on CPU
-                var vData = velocity.DownloadToArray();
+                // Download x and update on CPU
                 var xData = xBatch.DownloadToArray();
 
                 // Euler step: x = x + dt * v
