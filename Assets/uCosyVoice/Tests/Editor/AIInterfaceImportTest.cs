@@ -9,6 +9,7 @@ namespace uCosyVoice.Tests.Editor
     /// <summary>
     /// Tests for verifying ONNX model import and inference with Unity AI Interface
     /// </summary>
+    [Category("RequiresModels")]
     public class AIInterfaceImportTest
     {
         private const string ModelsPath = "Assets/Models/";

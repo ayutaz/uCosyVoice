@@ -171,6 +171,7 @@ namespace uCosyVoice.Tests.Editor
         #region HiFTInference Tests
 
         [Test]
+        [Category("RequiresModels")]
         public void HiFTInference_CanInstantiate()
         {
             var f0ModelAsset = AssetDatabase.LoadAssetAtPath<ModelAsset>(ModelsPath + "hift_f0_predictor_fp32.onnx");
@@ -192,6 +193,7 @@ namespace uCosyVoice.Tests.Editor
         }
 
         [Test]
+        [Category("RequiresModels")]
         public void HiFTInference_Process_ProducesAudio()
         {
             var f0ModelAsset = AssetDatabase.LoadAssetAtPath<ModelAsset>(ModelsPath + "hift_f0_predictor_fp32.onnx");
