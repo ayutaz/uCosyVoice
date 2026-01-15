@@ -61,9 +61,9 @@ namespace uCosyVoice.Samples
                 _stopButton.gameObject.SetActive(false);
             }
 
-            // Set default text
+            // Set default text (same as Python comparison test)
             if (_textInput != null && string.IsNullOrEmpty(_textInput.text))
-                _textInput.text = "Hello, this is a test of CosyVoice text to speech synthesis.";
+                _textInput.text = "Hello, this is a test of CosyVoice.";
 
             SetStatus("Click 'Load Models' to initialize TTS.");
             SetStats("");
@@ -189,18 +189,21 @@ namespace uCosyVoice.Samples
 
             try
             {
-                // Load prompt audio if not cached
-                if (_promptAudio == null)
+                // Always reload prompt audio to ensure fresh data
+                if (_promptAudioClip == null)
                 {
-                    if (_promptAudioClip == null)
-                    {
-                        SetStatus("Error: No prompt audio clip assigned in Inspector.");
-                        return;
-                    }
+                    SetStatus("Error: No prompt audio clip assigned in Inspector.");
+                    return;
+                }
 
-                    SetStatus("Processing reference voice...");
-                    _promptAudio = ExtractAndResampleAudio(_promptAudioClip, 16000);
-                    Debug.Log($"[TTSDemo] Prompt audio: {_promptAudio.Length} samples at 16kHz ({_promptAudio.Length / 16000f:F2}s)");
+                SetStatus("Processing reference voice...");
+                _promptAudio = ExtractAndResampleAudio(_promptAudioClip, 16000);
+                Debug.Log($"[TTSDemo] Prompt audio: {_promptAudio.Length} samples at 16kHz ({_promptAudio.Length / 16000f:F2}s)");
+
+                if (_promptAudio == null || _promptAudio.Length == 0)
+                {
+                    SetStatus("Error: Failed to extract prompt audio.");
+                    return;
                 }
 
                 SetStatus("Synthesizing with voice cloning... (UI may freeze)");
