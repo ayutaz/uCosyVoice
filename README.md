@@ -1,97 +1,99 @@
 # uCosyVoice
 
-Unity implementation of [CosyVoice3](https://github.com/FunAudioLLM/CosyVoice) text-to-speech synthesis using Unity AI Interface (Sentis) for ONNX inference.
+[CosyVoice3](https://github.com/FunAudioLLM/CosyVoice)のテキスト音声合成をUnity AI Interface（Sentis）でONNX推論するUnity実装です。
 
 [![Unity](https://img.shields.io/badge/Unity-6000.0+-black.svg)](https://unity.com/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-## Features
+**言語 / Language**: [English](README_EN.md) | [中文](README_CN.md)
 
-- **Full TTS Pipeline**: Text normalization → BPE tokenization → LLM → Flow Matching → HiFT vocoder
-- **Zero-shot Voice Cloning**: Clone any voice with just a few seconds of reference audio
-- **Pure C# Implementation**: No Python dependencies at runtime
-- **GPU Acceleration**: Support for both CPU and GPU backends
-- **118 Unit Tests**: Comprehensive test coverage
+## 特徴
 
-## Requirements
+- **完全なTTSパイプライン**: テキスト正規化 → BPEトークン化 → LLM → Flow Matching → HiFTボコーダー
+- **ゼロショット音声クローニング**: 数秒の参照音声で任意の声をクローン
+- **純粋なC#実装**: ランタイムでPython依存なし
+- **GPU高速化**: CPUとGPUバックエンドの両方をサポート
+- **118のユニットテスト**: 包括的なテストカバレッジ
 
-- Unity 6000.0 or later
-- Unity AI Interface (Sentis) 2.4.1+
-- Burst 1.8.18+
-- ONNX model files (see [Model Setup](#model-setup))
+## 要件
 
-## Installation
+- Unity 6000.0以降
+- Unity AI Interface (Sentis) 2.4.1以上
+- Burst 1.8.18以上
+- ONNXモデルファイル（[モデルセットアップ](#モデルセットアップ)参照）
 
-### Via Unity Package Manager
+## インストール
 
-1. Open Package Manager (Window > Package Manager)
-2. Click "+" and select "Add package from git URL"
-3. Enter: `https://github.com/ayutaz/uCosyVoice.git`
+### Unity Package Manager経由
 
-### Manual Installation
+1. Package Managerを開く（Window > Package Manager）
+2. 「+」をクリックして「Add package from git URL」を選択
+3. 入力: `https://github.com/ayutaz/uCosyVoice.git`
 
-1. Clone this repository
-2. Copy the `Assets/uCosyVoice` folder to your project's Assets folder
-3. Install dependencies via Package Manager:
-   - `com.unity.ai.inference` (2.4.1+)
-   - `com.unity.burst` (1.8.18+)
+### 手動インストール
 
-## Model Setup
+1. このリポジトリをクローン
+2. `Assets/uCosyVoice`フォルダをプロジェクトのAssetsフォルダにコピー
+3. Package Managerで依存パッケージをインストール:
+   - `com.unity.ai.inference` (2.4.1以上)
+   - `com.unity.burst` (1.8.18以上)
 
-ONNX model files are **not included** in this repository due to size (~3.8GB total).
+## モデルセットアップ
 
-### Required Models
+ONNXモデルファイルはサイズ（約3.8GB）のため、このリポジトリには**含まれていません**。
 
-Place the following models in `Assets/Models/`:
+### 必須モデル
 
-| Model | Size | Description |
-|-------|------|-------------|
-| `text_embedding_fp32.onnx` | ~580MB | Text token embedding |
-| `llm_backbone_initial_fp16.onnx` | ~900MB | LLM initial pass |
-| `llm_backbone_decode_fp16.onnx` | ~900MB | LLM decode step |
-| `llm_decoder_fp16.onnx` | ~25MB | LLM output decoder |
-| `llm_speech_embedding_fp16.onnx` | ~25MB | Speech token embedding |
-| `flow_token_embedding_fp16.onnx` | ~25MB | Flow token embedding |
-| `flow_pre_lookahead_fp16.onnx` | ~50MB | Flow pre-lookahead |
-| `flow_speaker_projection_fp16.onnx` | ~1MB | Speaker projection |
-| `flow.decoder.estimator.fp16.onnx` | ~300MB | Flow DiT estimator |
-| `hift_f0_predictor_fp32.onnx` | ~5MB | F0 prediction |
-| `hift_source_generator_fp32.onnx` | ~1MB | Source signal generation |
-| `hift_decoder_fp32.onnx` | ~50MB | HiFT decoder |
+以下のモデルを`Assets/Models/`に配置してください：
 
-### Optional Models (for Voice Cloning)
+| モデル | サイズ | 説明 |
+|-------|------|------|
+| `text_embedding_fp32.onnx` | ~580MB | テキストトークン埋め込み |
+| `llm_backbone_initial_fp16.onnx` | ~900MB | LLM初期パス |
+| `llm_backbone_decode_fp16.onnx` | ~900MB | LLMデコードステップ |
+| `llm_decoder_fp16.onnx` | ~25MB | LLM出力デコーダー |
+| `llm_speech_embedding_fp16.onnx` | ~25MB | 音声トークン埋め込み |
+| `flow_token_embedding_fp16.onnx` | ~25MB | Flowトークン埋め込み |
+| `flow_pre_lookahead_fp16.onnx` | ~50MB | Flow前処理 |
+| `flow_speaker_projection_fp16.onnx` | ~1MB | 話者プロジェクション |
+| `flow.decoder.estimator.fp16.onnx` | ~300MB | Flow DiT推定器 |
+| `hift_f0_predictor_fp32.onnx` | ~5MB | F0予測 |
+| `hift_source_generator_fp32.onnx` | ~1MB | ソース信号生成 |
+| `hift_decoder_fp32.onnx` | ~50MB | HiFTデコーダー |
 
-| Model | Size | Description |
-|-------|------|-------------|
-| `campplus.onnx` | ~7MB | Speaker encoder (CAM++) |
-| `speech_tokenizer_v3.onnx` | ~100MB | Speech tokenizer |
+### オプションモデル（音声クローニング用）
 
-### Tokenizer Files
+| モデル | サイズ | 説明 |
+|-------|------|------|
+| `campplus.onnx` | ~7MB | 話者エンコーダー（CAM++） |
+| `speech_tokenizer_v3.onnx` | ~100MB | 音声トークナイザー |
 
-Place in `Assets/StreamingAssets/CosyVoice/tokenizer/`:
-- `vocab.json` (~5MB, 151,646 tokens)
-- `merges.txt` (~3MB, 134,839 BPE rules)
+### トークナイザーファイル
 
-### Getting the Models
+`Assets/StreamingAssets/CosyVoice/tokenizer/`に配置：
+- `vocab.json`（~5MB、151,646トークン）
+- `merges.txt`（~3MB、134,839 BPEルール）
 
-You can export models from the original CosyVoice repository:
+### モデルの入手方法
+
+オリジナルのCosyVoiceリポジトリからモデルをエクスポートできます：
 
 ```bash
 git clone https://github.com/FunAudioLLM/CosyVoice
 cd CosyVoice
-# Follow ONNX export instructions
+# ONNXエクスポート手順に従う
 ```
 
-## Quick Start
+## クイックスタート
 
-### Using the Sample Scene
+### サンプルシーンの使用
 
-1. Open `Assets/uCosyVoice/Samples/TTSSampleScene.unity`
-2. Enter Play Mode
-3. Click "Load Models" (initial loading takes time)
-4. Enter text and click "Synthesize"
+1. `Assets/uCosyVoice/Samples/TTSSampleScene.unity`を開く
+2. Play Modeを開始
+3. 「Load Models」をクリック（初回読み込みには時間がかかります）
+4. テキストを入力して「Synthesize」をクリック
 
-### Basic API Usage
+### 基本的なAPI使用法
 
 ```csharp
 using uCosyVoice.Core;
@@ -102,18 +104,18 @@ public class TTSExample : MonoBehaviour
     private CosyVoiceManager _manager;
     private AudioSource _audioSource;
 
-    async void Start()
+    IEnumerator Start()
     {
         _audioSource = GetComponent<AudioSource>();
         _manager = new CosyVoiceManager();
 
-        // Load models (async recommended)
+        // モデルをロード（非同期推奨）
         yield return _manager.LoadAsync(BackendType.CPU);
 
-        // Synthesize speech
+        // 音声を合成
         float[] audio = _manager.Synthesize("Hello, world!");
 
-        // Create and play AudioClip
+        // AudioClipを作成して再生
         AudioClip clip = _manager.CreateAudioClip(audio);
         _audioSource.clip = clip;
         _audioSource.Play();
@@ -126,107 +128,107 @@ public class TTSExample : MonoBehaviour
 }
 ```
 
-### Voice Cloning (Zero-shot)
+### 音声クローニング（ゼロショット）
 
 ```csharp
-// Load prompt models for voice cloning
+// 音声クローニング用のプロンプトモデルをロード
 _manager.LoadPromptModels();
 
-// Clone voice from reference audio (16kHz)
-float[] promptAudio = LoadAudio("reference.wav"); // 16kHz mono
+// 参照音声（16kHz）から声をクローン
+float[] promptAudio = LoadAudio("reference.wav"); // 16kHzモノラル
 float[] audio = _manager.SynthesizeWithPrompt(
-    "Text to synthesize",
+    "合成するテキスト",
     promptAudio
 );
 
-// Or extract and reuse speaker embedding
+// または話者埋め込みを抽出して再利用
 float[] embedding = _manager.ExtractSpeakerEmbedding(promptAudio);
 _manager.SetDefaultSpeakerEmbedding(embedding);
-float[] audio2 = _manager.Synthesize("Another sentence with same voice.");
+float[] audio2 = _manager.Synthesize("同じ声で別の文章。");
 ```
 
-## Architecture
+## アーキテクチャ
 
 ```
-Input Text
+入力テキスト
     │
     ▼
 ┌─────────────────┐
-│ TextNormalizer  │  Normalize numbers, abbreviations
+│ TextNormalizer  │  数字・略語を正規化
 └────────┬────────┘
          │
          ▼
 ┌─────────────────┐
-│ Qwen2Tokenizer  │  BPE tokenization (151,646 vocab)
+│ Qwen2Tokenizer  │  BPEトークン化（151,646語彙）
 └────────┬────────┘
          │
          ▼
 ┌─────────────────┐
-│   LLMRunner     │  Autoregressive speech token generation
-│  (Qwen2-based)  │  KV-cache for efficient decoding
+│   LLMRunner     │  自己回帰で音声トークン生成
+│  (Qwen2ベース)  │  効率的なKVキャッシュ
 └────────┬────────┘
          │
          ▼
 ┌─────────────────┐
-│   FlowRunner    │  DiT + Euler ODE solver (10 steps)
-│ (Flow Matching) │  Speech tokens → Mel spectrogram
+│   FlowRunner    │  DiT + Euler ODEソルバー（10ステップ）
+│ (Flow Matching) │  音声トークン → メルスペクトログラム
 └────────┬────────┘
          │
          ▼
 ┌─────────────────┐
-│ HiFTInference   │  F0 prediction + Source generation
-│   (Vocoder)     │  Mini STFT/ISTFT (n_fft=16)
+│ HiFTInference   │  F0予測 + ソース生成
+│  （ボコーダー） │  Mini STFT/ISTFT (n_fft=16)
 └────────┬────────┘
          │
          ▼
-   Audio (24kHz)
+   音声出力 (24kHz)
 ```
 
-## Configuration
+## 設定
 
 ```csharp
 var manager = new CosyVoiceManager
 {
-    MaxTokens = 500,    // Maximum speech tokens
-    MinTokens = 10,     // Minimum speech tokens
-    SamplingK = 25      // Top-k sampling parameter
+    MaxTokens = 500,    // 最大音声トークン数
+    MinTokens = 10,     // 最小音声トークン数
+    SamplingK = 25      // Top-kサンプリングパラメータ
 };
 ```
 
-## Performance
+## パフォーマンス
 
-| Backend | Model Loading | Synthesis (10 words) |
-|---------|---------------|---------------------|
-| CPU | ~8s | ~15-30s |
-| GPUCompute | ~7.5s | ~10-20s |
+| バックエンド | モデル読み込み | 合成（10単語） |
+|------------|--------------|---------------|
+| CPU | 約8秒 | 約15-30秒 |
+| GPUCompute | 約7.5秒 | 約10-20秒 |
 
-*Tested on Windows with RTX 3080*
+*Windows + RTX 3080でテスト*
 
-## Language Support
+## 言語サポート
 
-Currently **English only**. The tokenizer and text normalization are optimized for English text.
+現在は**英語のみ**対応。トークナイザーとテキスト正規化は英語テキストに最適化されています。
 
-## Troubleshooting
+## トラブルシューティング
 
-### "Model file not found" Error
-Ensure all ONNX models are placed in `Assets/Models/` directory.
+### 「Model file not found」エラー
+すべてのONNXモデルが`Assets/Models/`ディレクトリに配置されていることを確認してください。
 
-### GPU Backend Errors
-If you encounter tensor read errors with GPU backend, ensure you're using the latest version which includes proper `DownloadToArray()` calls for GPU compatibility.
+### GPUバックエンドエラー
+GPUバックエンドでテンソル読み取りエラーが発生する場合は、GPU互換性のための適切な`DownloadToArray()`呼び出しを含む最新バージョンを使用していることを確認してください。
 
-### Out of Memory
-Try using CPU backend or reducing `MaxTokens` parameter.
+### メモリ不足
+CPUバックエンドを使用するか、`MaxTokens`パラメータを減らしてみてください。
 
-## License
+## ライセンス
 
-MIT License - see [LICENSE](LICENSE) file.
+MITライセンス - [LICENSE](LICENSE)ファイルを参照。
 
-## Acknowledgments
+## 謝辞
 
-- [CosyVoice](https://github.com/FunAudioLLM/CosyVoice) - Original PyTorch implementation
-- [Unity AI Interface](https://docs.unity3d.com/Packages/com.unity.ai.inference@latest) - ONNX inference runtime
+- [CosyVoice](https://github.com/FunAudioLLM/CosyVoice) - オリジナルのPyTorch実装
+- [Unity AI Interface](https://docs.unity3d.com/Packages/com.unity.ai.inference@latest) - ONNX推論ランタイム
 
-## References
+## 参考文献
 
-- [CosyVoice3 Paper](https://arxiv.org/pdf/2505.17589)
+- [CosyVoice3論文](https://arxiv.org/pdf/2505.17589)
 - [Fun Audio LLM](https://funaudiollm.github.io/)
