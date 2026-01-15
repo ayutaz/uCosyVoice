@@ -251,9 +251,7 @@ Assets/
 └── uCosyVoice/
     ├── Samples/
     │   ├── TTSDemo.cs                  # デモスクリプト
-    │   ├── TTSSampleScene.unity        # サンプルシーン
-    │   └── Editor/
-    │       └── TTSSampleSceneSetup.cs  # シーン生成ツール
+    │   └── TTSSampleScene.unity        # サンプルシーン
     ├── Runtime/
     │   ├── Audio/
     │   │   ├── MiniSTFT.cs              # 16点STFT
@@ -376,11 +374,34 @@ var xBatch = Concat(x, x, axis: 0);  // [2, 80, T]
 
 ## 特殊トークン
 
+### 音声トークン（LLMRunner）
+
 | トークン | ID | 用途 |
 |---------|-----|------|
 | SOS | 6561 | シーケンス開始 |
 | EOS | 6562 | シーケンス終了 |
 | TASK_ID | 6563 | タスク識別 |
+
+### テキストトークン（Qwen2Tokenizer）
+
+| トークン | 用途 |
+|---------|------|
+| `<\|endofprompt\|>` | CosyVoice3のゼロショットTTSでシステムプロンプトとオーディオ書き起こしの区切り |
+| `<\|en\|>`, `<\|zh\|>`, etc. | 言語タグ（クロスリンガルモード用、現在未使用） |
+
+### ゼロショットTTSのテキスト形式
+
+CosyVoice3のゼロショットTTSでは、prompt_textに以下の形式が**必須**：
+
+```
+You are a helpful assistant.<|endofprompt|>参照音声の書き起こしテキスト
+```
+
+- **システムプロンプト**: `"You are a helpful assistant."`（固定）
+- **区切りマーカー**: `<|endofprompt|>`
+- **書き起こし**: 参照音声の内容
+
+> **重要**: この形式が正しくない場合、生成音声の先頭に不要な音声が含まれることがあります。
 
 ---
 

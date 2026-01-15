@@ -68,6 +68,17 @@ namespace uCosyVoice.Tokenizer
             Debug.Log($"Qwen2Tokenizer loaded: {_vocab.Count} tokens, {_merges.Count} merges");
         }
 
+        // Known special tokens that should be tokenized as single units
+        private static readonly string[] SpecialTokens = new[]
+        {
+            "<|endofprompt|>",
+            "<|en|>",
+            "<|zh|>",
+            "<|ja|>",
+            "<|ko|>",
+            "<|yue|>",
+        };
+
         /// <summary>
         /// Encode text to token IDs.
         /// </summary>
@@ -83,7 +94,96 @@ namespace uCosyVoice.Tokenizer
 
             var tokens = new List<int>();
 
-            // Process text word by word (split on whitespace)
+            // First, extract special tokens and split text around them
+            var segments = SplitWithSpecialTokens(text);
+
+            foreach (var segment in segments)
+            {
+                if (segment.isSpecial)
+                {
+                    // Look up special token directly in vocabulary
+                    if (_vocab.TryGetValue(segment.text, out int tokenId))
+                    {
+                        tokens.Add(tokenId);
+                    }
+                    else
+                    {
+                        // Fallback: tokenize as regular text if not in vocabulary
+                        Debug.LogWarning($"Special token '{segment.text}' not found in vocabulary, tokenizing as regular text");
+                        var wordTokens = TokenizeSegment(segment.text);
+                        tokens.AddRange(wordTokens);
+                    }
+                }
+                else
+                {
+                    // Process regular text word by word
+                    var wordTokens = TokenizeSegment(segment.text);
+                    tokens.AddRange(wordTokens);
+                }
+            }
+
+            return tokens.ToArray();
+        }
+
+        private List<(string text, bool isSpecial)> SplitWithSpecialTokens(string text)
+        {
+            var result = new List<(string, bool)>();
+            int pos = 0;
+
+            while (pos < text.Length)
+            {
+                // Check for special tokens at current position
+                string foundToken = null;
+                foreach (var specialToken in SpecialTokens)
+                {
+                    if (pos + specialToken.Length <= text.Length &&
+                        text.Substring(pos, specialToken.Length) == specialToken)
+                    {
+                        foundToken = specialToken;
+                        break;
+                    }
+                }
+
+                if (foundToken != null)
+                {
+                    // Add preceding text if any
+                    if (pos > 0 && result.Count == 0)
+                    {
+                        // No preceding text has been added yet
+                    }
+
+                    // Add the special token
+                    result.Add((foundToken, true));
+                    pos += foundToken.Length;
+                }
+                else
+                {
+                    // Find next special token or end of string
+                    int nextSpecialPos = text.Length;
+                    foreach (var specialToken in SpecialTokens)
+                    {
+                        int idx = text.IndexOf(specialToken, pos, StringComparison.Ordinal);
+                        if (idx >= 0 && idx < nextSpecialPos)
+                        {
+                            nextSpecialPos = idx;
+                        }
+                    }
+
+                    // Add regular text segment
+                    if (nextSpecialPos > pos)
+                    {
+                        result.Add((text.Substring(pos, nextSpecialPos - pos), false));
+                    }
+                    pos = nextSpecialPos;
+                }
+            }
+
+            return result;
+        }
+
+        private List<int> TokenizeSegment(string text)
+        {
+            var tokens = new List<int>();
             var words = SplitIntoWords(text);
 
             foreach (var word in words)
@@ -92,7 +192,7 @@ namespace uCosyVoice.Tokenizer
                 tokens.AddRange(wordTokens);
             }
 
-            return tokens.ToArray();
+            return tokens;
         }
 
         /// <summary>

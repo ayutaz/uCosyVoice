@@ -443,6 +443,10 @@ namespace uCosyVoice.Core
             return SynthesizeWithPrompt(text, null, promptAudio, null);
         }
 
+        // CosyVoice3 requires this marker to separate system prompt from prompt transcript
+        private const string END_OF_PROMPT_MARKER = "<|endofprompt|>";
+        private const string SYSTEM_PROMPT = "You are a helpful assistant.";
+
         /// <summary>
         /// Synthesize speech from text using voice cloning from prompt audio (zero-shot TTS).
         /// Requires LoadPromptModels() to be called first.
@@ -466,19 +470,33 @@ namespace uCosyVoice.Core
             if (promptAudio16k == null || promptAudio16k.Length == 0)
                 return Synthesize(text); // Fall back to default speaker
 
-            // 1. Normalize texts
+            // 1. Normalize TTS text (the text to synthesize)
             var normalizedTtsText = TextNormalizer.Normalize(text);
-            var normalizedPromptText = string.IsNullOrWhiteSpace(promptText)
-                ? ""
-                : TextNormalizer.Normalize(promptText);
+
+            // 2. Build prompt text with CosyVoice3 format:
+            //    "You are a helpful assistant.<|endofprompt|>Transcript of prompt audio"
+            //    Note: Text containing <|...|> markers should NOT be normalized (per Python behavior)
+            string normalizedPromptText;
+            if (string.IsNullOrWhiteSpace(promptText))
+            {
+                normalizedPromptText = "";
+            }
+            else
+            {
+                // Normalize the transcript part only, then combine with system prompt
+                var normalizedTranscript = TextNormalizer.Normalize(promptText);
+                normalizedPromptText = SYSTEM_PROMPT + END_OF_PROMPT_MARKER + normalizedTranscript;
+            }
             Debug.Log($"[CosyVoice] Prompt text: {normalizedPromptText}");
             Debug.Log($"[CosyVoice] TTS text: {normalizedTtsText}");
 
             // 2. Tokenize prompt text and TTS text
             Tensor<int> promptTextTokens = null;
+            int promptTextTokenCount = 0;
             if (!string.IsNullOrEmpty(normalizedPromptText))
             {
                 var promptTokensArr = _tokenizer.Encode(normalizedPromptText);
+                promptTextTokenCount = promptTokensArr.Length;
                 promptTextTokens = new Tensor<int>(new TensorShape(1, promptTokensArr.Length));
                 for (int i = 0; i < promptTokensArr.Length; i++)
                     promptTextTokens[0, i] = promptTokensArr[i];
@@ -486,6 +504,7 @@ namespace uCosyVoice.Core
             }
 
             var ttsTokensArr = _tokenizer.Encode(normalizedTtsText);
+            int ttsTextTokenCount = ttsTokensArr.Length;
             using var ttsTextTokens = new Tensor<int>(new TensorShape(1, ttsTokensArr.Length));
             for (int i = 0; i < ttsTokensArr.Length; i++)
                 ttsTextTokens[0, i] = ttsTokensArr[i];

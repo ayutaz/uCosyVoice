@@ -243,6 +243,60 @@ namespace uCosyVoice.Tests.Editor
             Assert.Throws<System.InvalidOperationException>(() => tokenizer.Encode("test"));
         }
 
+        [Test]
+        public void Qwen2Tokenizer_SpecialToken_EndOfPrompt()
+        {
+            if (!File.Exists(_vocabPath) || !File.Exists(_mergesPath))
+            {
+                Assert.Ignore("Tokenizer files not found");
+                return;
+            }
+
+            var tokenizer = new Qwen2Tokenizer();
+            tokenizer.LoadFromPaths(_vocabPath, _mergesPath);
+
+            // Test that <|endofprompt|> is tokenized properly
+            var tokens = tokenizer.Encode("You are a helpful assistant.<|endofprompt|>Hello world");
+            Assert.IsNotNull(tokens);
+            Assert.Greater(tokens.Length, 0);
+            Debug.Log($"Text with <|endofprompt|> -> {tokens.Length} tokens: [{string.Join(", ", tokens)}]");
+
+            // Decode and verify the special token is preserved
+            var decoded = tokenizer.Decode(tokens);
+            Debug.Log($"Decoded: '{decoded}'");
+
+            // The special token should be in the decoded output
+            Assert.IsTrue(decoded.Contains("endofprompt") || decoded.Contains("<|"),
+                "Special token should be preserved in decode");
+        }
+
+        [Test]
+        public void Qwen2Tokenizer_CosyVoice3_PromptTextFormat()
+        {
+            if (!File.Exists(_vocabPath) || !File.Exists(_mergesPath))
+            {
+                Assert.Ignore("Tokenizer files not found");
+                return;
+            }
+
+            var tokenizer = new Qwen2Tokenizer();
+            tokenizer.LoadFromPaths(_vocabPath, _mergesPath);
+
+            // Test the full CosyVoice3 prompt format
+            var promptText = "You are a helpful assistant.<|endofprompt|>Hello, my name is Sarah.";
+            var tokens = tokenizer.Encode(promptText);
+
+            Assert.IsNotNull(tokens);
+            Assert.Greater(tokens.Length, 0);
+            Debug.Log($"CosyVoice3 prompt format -> {tokens.Length} tokens");
+
+            // Test TTS text (plain text without special tokens)
+            var ttsText = "Nice to meet you!";
+            var ttsTokens = tokenizer.Encode(ttsText);
+            Assert.Greater(ttsTokens.Length, 0);
+            Debug.Log($"TTS text -> {ttsTokens.Length} tokens");
+        }
+
         #endregion
     }
 }
