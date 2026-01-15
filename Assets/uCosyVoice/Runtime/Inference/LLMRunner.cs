@@ -165,11 +165,15 @@ namespace uCosyVoice.Inference
             var hiddenStates = _backboneInitialWorker.PeekOutput("hidden_states") as Tensor<float>;
             hiddenStates.ReadbackAndClone();
 
-            // Get KV cache
-            var kvCache = _backboneInitialWorker.PeekOutput("past_key_values") as Tensor<float>;
-            kvCache.ReadbackAndClone();
-            var kvCacheData = kvCache.DownloadToArray();
-            var kvCacheShape = kvCache.shape;
+            // Get KV cache (must dispose after copying data)
+            float[] kvCacheData;
+            TensorShape kvCacheShape;
+            using (var kvCache = _backboneInitialWorker.PeekOutput("past_key_values") as Tensor<float>)
+            {
+                kvCache.ReadbackAndClone();
+                kvCacheData = kvCache.DownloadToArray();
+                kvCacheShape = kvCache.shape;
+            }
 
             lmInput.Dispose();
 
@@ -215,11 +219,13 @@ namespace uCosyVoice.Inference
                 var newHiddenStates = _backboneDecodeWorker.PeekOutput("hidden_states") as Tensor<float>;
                 newHiddenStates.ReadbackAndClone();
 
-                // Update KV cache (decode model outputs "new_past_key_values")
-                var newKvCache = _backboneDecodeWorker.PeekOutput("new_past_key_values") as Tensor<float>;
-                newKvCache.ReadbackAndClone();
-                kvCacheData = newKvCache.DownloadToArray();
-                kvCacheShape = newKvCache.shape;
+                // Update KV cache (decode model outputs "new_past_key_values") - must dispose after copying data
+                using (var newKvCache = _backboneDecodeWorker.PeekOutput("new_past_key_values") as Tensor<float>)
+                {
+                    newKvCache.ReadbackAndClone();
+                    kvCacheData = newKvCache.DownloadToArray();
+                    kvCacheShape = newKvCache.shape;
+                }
 
                 // Get logits
                 logits = GetLogits(newHiddenStates);
