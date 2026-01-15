@@ -8,7 +8,7 @@ using uCosyVoice.Core;
 namespace uCosyVoice.Samples
 {
     /// <summary>
-    /// Simple Text-to-Speech demo for CosyVoice3 using Unity UI + TextMeshPro.
+    /// Text-to-Speech demo for CosyVoice3 with zero-shot voice cloning.
     /// </summary>
     public class TTSDemo : MonoBehaviour
     {
@@ -19,6 +19,14 @@ namespace uCosyVoice.Samples
         [SerializeField] private Button _stopButton;
         [SerializeField] private TMP_Text _statusText;
         [SerializeField] private TMP_Text _statsText;
+
+        [Header("Zero-Shot Settings")]
+        [Tooltip("Reference audio clip for voice cloning (should be 16kHz or will be resampled)")]
+        [SerializeField] private AudioClip _promptAudioClip;
+
+        [Tooltip("Transcript of the prompt audio")]
+        [TextArea(2, 4)]
+        [SerializeField] private string _defaultPromptText = "Hello, my name is Sarah. I'm excited to help you with your project today. Let me know if you have any questions.";
 
         [Header("Audio")]
         [SerializeField] private AudioSource _audioSource;
@@ -32,6 +40,8 @@ namespace uCosyVoice.Samples
         private CosyVoiceManager _manager;
         private bool _isLoading;
         private bool _isSynthesizing;
+        private bool _promptModelsLoaded;
+        private float[] _promptAudio;
 
         private void Start()
         {
@@ -114,9 +124,20 @@ namespace uCosyVoice.Samples
 
             if (loadSuccess)
             {
-                SetStatus("Models loaded! Enter text and click 'Synthesize'.");
-                _synthesizeButton.interactable = true;
-                _loadButton.gameObject.SetActive(false);
+                // Always load prompt models for zero-shot
+                LoadPromptModels();
+
+                if (_promptModelsLoaded)
+                {
+                    SetStatus("Models loaded! Enter text and click 'Synthesize'.");
+                    _synthesizeButton.interactable = true;
+                    _loadButton.gameObject.SetActive(false);
+                }
+                else
+                {
+                    SetStatus("Error loading voice cloning models.");
+                    _loadButton.interactable = true;
+                }
             }
             else
             {
@@ -125,6 +146,25 @@ namespace uCosyVoice.Samples
             }
 
             _isLoading = false;
+        }
+
+        private void LoadPromptModels()
+        {
+            if (_promptModelsLoaded)
+                return;
+
+            try
+            {
+                SetStatus("Loading voice cloning models...");
+                _manager.LoadPromptModels(_backendType);
+                _promptModelsLoaded = true;
+                Debug.Log("[TTSDemo] Prompt models loaded successfully");
+            }
+            catch (Exception ex)
+            {
+                SetStatus($"Error loading voice cloning models: {ex.Message}");
+                Debug.LogException(ex);
+            }
         }
 
         private void OnSynthesizeClicked()
@@ -139,21 +179,36 @@ namespace uCosyVoice.Samples
                 return;
             }
 
-            DoSynthesize(text);
+            DoSynthesizeZeroShot(text);
         }
 
-        private void DoSynthesize(string text)
+        private void DoSynthesizeZeroShot(string text)
         {
             _isSynthesizing = true;
             _synthesizeButton.interactable = false;
-            SetStatus("Synthesizing speech... (UI may freeze)");
 
             try
             {
+                // Load prompt audio if not cached
+                if (_promptAudio == null)
+                {
+                    if (_promptAudioClip == null)
+                    {
+                        SetStatus("Error: No prompt audio clip assigned in Inspector.");
+                        return;
+                    }
+
+                    SetStatus("Processing reference voice...");
+                    _promptAudio = ExtractAndResampleAudio(_promptAudioClip, 16000);
+                    Debug.Log($"[TTSDemo] Prompt audio: {_promptAudio.Length} samples at 16kHz ({_promptAudio.Length / 16000f:F2}s)");
+                }
+
+                SetStatus("Synthesizing with voice cloning... (UI may freeze)");
+
                 var startTime = Time.realtimeSinceStartup;
 
-                // Run synthesis on main thread (Unity AI Interface requirement)
-                var audio = _manager.Synthesize(text);
+                // Run zero-shot synthesis
+                var audio = _manager.SynthesizeWithPrompt(text, _defaultPromptText, _promptAudio);
 
                 var elapsed = Time.realtimeSinceStartup - startTime;
 
@@ -162,7 +217,7 @@ namespace uCosyVoice.Samples
                     float duration = (float)audio.Length / CosyVoiceManager.OUTPUT_SAMPLE_RATE;
 
                     // Create and play AudioClip
-                    var clip = _manager.CreateAudioClip(audio, "TTS_Output");
+                    var clip = _manager.CreateAudioClip(audio, "TTS_ZeroShot_Output");
                     _audioSource.clip = clip;
                     _audioSource.Play();
 
@@ -207,6 +262,57 @@ namespace uCosyVoice.Samples
         {
             if (_statsText != null)
                 _statsText.text = message;
+        }
+
+        /// <summary>
+        /// Extract audio samples from AudioClip and resample to target sample rate.
+        /// </summary>
+        private static float[] ExtractAndResampleAudio(AudioClip clip, int targetSampleRate)
+        {
+            // Extract samples from AudioClip
+            var samples = new float[clip.samples * clip.channels];
+            clip.GetData(samples, 0);
+
+            // Mix down to mono if stereo
+            float[] monoSamples;
+            if (clip.channels > 1)
+            {
+                monoSamples = new float[clip.samples];
+                for (int i = 0; i < clip.samples; i++)
+                {
+                    float sum = 0f;
+                    for (int ch = 0; ch < clip.channels; ch++)
+                    {
+                        sum += samples[i * clip.channels + ch];
+                    }
+                    monoSamples[i] = sum / clip.channels;
+                }
+            }
+            else
+            {
+                monoSamples = samples;
+            }
+
+            // Resample if needed
+            if (clip.frequency != targetSampleRate)
+            {
+                double ratio = (double)clip.frequency / targetSampleRate;
+                int outLen = (int)(monoSamples.Length / ratio);
+                var resampled = new float[outLen];
+
+                for (int i = 0; i < outLen; i++)
+                {
+                    double srcIdx = i * ratio;
+                    int idx0 = Math.Min((int)srcIdx, monoSamples.Length - 1);
+                    int idx1 = Math.Min(idx0 + 1, monoSamples.Length - 1);
+                    double frac = srcIdx - idx0;
+                    resampled[i] = (float)(monoSamples[idx0] + frac * (monoSamples[idx1] - monoSamples[idx0]));
+                }
+
+                return resampled;
+            }
+
+            return monoSamples;
         }
     }
 }

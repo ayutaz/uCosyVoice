@@ -47,7 +47,7 @@ namespace uCosyVoice.Samples.Editor
             var panelRect = panelGO.AddComponent<RectTransform>();
             panelRect.anchorMin = new Vector2(0.5f, 0.5f);
             panelRect.anchorMax = new Vector2(0.5f, 0.5f);
-            panelRect.sizeDelta = new Vector2(700, 550);
+            panelRect.sizeDelta = new Vector2(700, 450);
             var panelImage = panelGO.AddComponent<Image>();
             panelImage.color = new Color(0.15f, 0.15f, 0.15f, 0.95f);
 
@@ -59,13 +59,22 @@ namespace uCosyVoice.Samples.Editor
             titleRect.anchoredPosition = new Vector2(0, -50);
             titleRect.sizeDelta = new Vector2(600, 60);
 
+            // Create Text Input Label
+            var inputLabelGO = CreateTextElement("InputLabel", panelGO.transform, "Text to Synthesize:", 18);
+            var inputLabelRect = inputLabelGO.GetComponent<RectTransform>();
+            inputLabelRect.anchorMin = new Vector2(0.5f, 1f);
+            inputLabelRect.anchorMax = new Vector2(0.5f, 1f);
+            inputLabelRect.anchoredPosition = new Vector2(-250, -100);
+            inputLabelRect.sizeDelta = new Vector2(200, 30);
+            inputLabelGO.GetComponent<TextMeshProUGUI>().alignment = TextAlignmentOptions.Left;
+
             // Create Text Input
             var inputGO = CreateInputField("TextInput", panelGO.transform);
             var inputRect = inputGO.GetComponent<RectTransform>();
             inputRect.anchorMin = new Vector2(0.5f, 1f);
             inputRect.anchorMax = new Vector2(0.5f, 1f);
-            inputRect.anchoredPosition = new Vector2(0, -150);
-            inputRect.sizeDelta = new Vector2(600, 120);
+            inputRect.anchoredPosition = new Vector2(0, -180);
+            inputRect.sizeDelta = new Vector2(600, 100);
             var inputField = inputGO.GetComponent<TMP_InputField>();
             inputField.text = "Hello, this is a test of CosyVoice text to speech synthesis.";
             inputField.lineType = TMP_InputField.LineType.MultiLineNewline;
@@ -75,7 +84,7 @@ namespace uCosyVoice.Samples.Editor
             var loadBtnRect = loadBtnGO.GetComponent<RectTransform>();
             loadBtnRect.anchorMin = new Vector2(0.5f, 1f);
             loadBtnRect.anchorMax = new Vector2(0.5f, 1f);
-            loadBtnRect.anchoredPosition = new Vector2(-150, -260);
+            loadBtnRect.anchoredPosition = new Vector2(-150, -280);
             loadBtnRect.sizeDelta = new Vector2(200, 50);
 
             // Create Synthesize Button
@@ -83,7 +92,7 @@ namespace uCosyVoice.Samples.Editor
             var synthBtnRect = synthBtnGO.GetComponent<RectTransform>();
             synthBtnRect.anchorMin = new Vector2(0.5f, 1f);
             synthBtnRect.anchorMax = new Vector2(0.5f, 1f);
-            synthBtnRect.anchoredPosition = new Vector2(100, -260);
+            synthBtnRect.anchoredPosition = new Vector2(100, -280);
             synthBtnRect.sizeDelta = new Vector2(200, 50);
 
             // Create Stop Button
@@ -91,7 +100,7 @@ namespace uCosyVoice.Samples.Editor
             var stopBtnRect = stopBtnGO.GetComponent<RectTransform>();
             stopBtnRect.anchorMin = new Vector2(0.5f, 1f);
             stopBtnRect.anchorMax = new Vector2(0.5f, 1f);
-            stopBtnRect.anchoredPosition = new Vector2(250, -260);
+            stopBtnRect.anchoredPosition = new Vector2(250, -280);
             stopBtnRect.sizeDelta = new Vector2(100, 50);
             var stopBtnColors = stopBtnGO.GetComponent<Button>().colors;
             stopBtnColors.normalColor = new Color(0.8f, 0.3f, 0.3f);
@@ -102,7 +111,7 @@ namespace uCosyVoice.Samples.Editor
             var statusRect = statusGO.GetComponent<RectTransform>();
             statusRect.anchorMin = new Vector2(0.5f, 1f);
             statusRect.anchorMax = new Vector2(0.5f, 1f);
-            statusRect.anchoredPosition = new Vector2(0, -340);
+            statusRect.anchoredPosition = new Vector2(0, -360);
             statusRect.sizeDelta = new Vector2(600, 40);
 
             // Create Stats Text
@@ -110,7 +119,7 @@ namespace uCosyVoice.Samples.Editor
             var statsRect = statsGO.GetComponent<RectTransform>();
             statsRect.anchorMin = new Vector2(0.5f, 1f);
             statsRect.anchorMax = new Vector2(0.5f, 1f);
-            statsRect.anchoredPosition = new Vector2(0, -390);
+            statsRect.anchoredPosition = new Vector2(0, -400);
             statsRect.sizeDelta = new Vector2(600, 30);
             var statsText = statsGO.GetComponent<TextMeshProUGUI>();
             statsText.color = new Color(0.7f, 0.7f, 0.7f);
@@ -130,6 +139,21 @@ namespace uCosyVoice.Samples.Editor
             so.FindProperty("_statusText").objectReferenceValue = statusGO.GetComponent<TextMeshProUGUI>();
             so.FindProperty("_statsText").objectReferenceValue = statsGO.GetComponent<TextMeshProUGUI>();
             so.FindProperty("_audioSource").objectReferenceValue = audioSource;
+
+            // Load and assign prompt audio clip
+            var promptAudioClip = AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/uCosyVoice/Samples/Audio/en_female_nova_greeting.wav");
+            if (promptAudioClip != null)
+            {
+                so.FindProperty("_promptAudioClip").objectReferenceValue = promptAudioClip;
+            }
+            else
+            {
+                Debug.LogWarning("[TTSSampleSceneSetup] Prompt audio clip not found at Assets/uCosyVoice/Samples/Audio/en_female_nova_greeting.wav");
+            }
+
+            // Set zero-shot settings (inspector values)
+            so.FindProperty("_defaultPromptText").stringValue = "Hello, my name is Sarah. I'm excited to help you with your project today. Let me know if you have any questions.";
+
             so.ApplyModifiedProperties();
 
             // Save the scene
@@ -219,7 +243,7 @@ namespace uCosyVoice.Samples.Editor
             placeholderRect.anchorMax = Vector2.one;
             placeholderRect.sizeDelta = Vector2.zero;
             var placeholderTmp = placeholderGO.AddComponent<TextMeshProUGUI>();
-            placeholderTmp.text = "Enter text to synthesize...";
+            placeholderTmp.text = "Enter text...";
             placeholderTmp.fontSize = 18;
             placeholderTmp.color = new Color(0.5f, 0.5f, 0.5f);
             placeholderTmp.alignment = TextAlignmentOptions.TopLeft;

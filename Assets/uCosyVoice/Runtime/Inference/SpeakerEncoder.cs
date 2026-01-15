@@ -14,6 +14,14 @@ namespace uCosyVoice.Inference
         public const int SAMPLE_RATE = 16000;
         public const int EMBEDDING_DIM = 192;
 
+        /// <summary>
+        /// Maximum frames supported by CAMPPlus position encoding.
+        /// The model has internal layers that halve the frame count, with position
+        /// embeddings limited to 100 at that layer. So input must be max 200 frames.
+        /// At 16kHz with 10ms frame shift, this is about 2 seconds of audio.
+        /// </summary>
+        public const int MAX_FRAMES = 200;
+
         private readonly Model _model;
         private readonly Worker _worker;
         private readonly KaldiFbank _fbankExtractor;
@@ -52,8 +60,17 @@ namespace uCosyVoice.Inference
             if (nFrames == 0)
                 throw new ArgumentException("Audio too short to extract features");
 
-            // Create input tensor [batch, frames, mels]
-            using var inputTensor = new Tensor<float>(new TensorShape(1, nFrames, nMels), Flatten3D(fbank));
+            // Truncate frames if exceeding CAMPPlus position encoding limit
+            int actualFrames = nFrames;
+            if (nFrames > MAX_FRAMES)
+            {
+                UnityEngine.Debug.LogWarning($"[SpeakerEncoder] Truncating {nFrames} frames to {MAX_FRAMES} (CAMPPlus limit)");
+                actualFrames = MAX_FRAMES;
+            }
+
+            // Create input tensor [batch, frames, mels] with truncation if needed
+            var flatData = Flatten3DTruncated(fbank, actualFrames);
+            using var inputTensor = new Tensor<float>(new TensorShape(1, actualFrames, nMels), flatData);
 
             // Run inference
             _worker.SetInput("input", inputTensor);
@@ -67,10 +84,10 @@ namespace uCosyVoice.Inference
             return embedding;
         }
 
-        private static float[] Flatten3D(float[,,] array)
+        private static float[] Flatten3DTruncated(float[,,] array, int maxFrames)
         {
             int d0 = array.GetLength(0);
-            int d1 = array.GetLength(1);
+            int d1 = Math.Min(array.GetLength(1), maxFrames);
             int d2 = array.GetLength(2);
             var result = new float[d0 * d1 * d2];
 
