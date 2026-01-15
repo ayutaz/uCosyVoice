@@ -3,7 +3,7 @@
 Unity implementation of [CosyVoice3](https://github.com/FunAudioLLM/CosyVoice) text-to-speech synthesis using Unity AI Interface (Sentis) for ONNX inference.
 
 [![Unity](https://img.shields.io/badge/Unity-6000.0+-black.svg)](https://unity.com/)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 **Language**: [日本語](README.md) | [中文](README_CN.md)
 
@@ -221,7 +221,7 @@ Try using CPU backend or reducing `MaxTokens` parameter.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) file.
+Apache License 2.0 - see [LICENSE](LICENSE) file.
 
 ## Acknowledgments
 

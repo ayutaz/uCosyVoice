@@ -3,7 +3,7 @@
 使用Unity AI Interface（Sentis）进行ONNX推理的[CosyVoice3](https://github.com/FunAudioLLM/CosyVoice)文本转语音Unity实现。
 
 [![Unity](https://img.shields.io/badge/Unity-6000.0+-black.svg)](https://unity.com/)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 **语言**: [日本語](README.md) | [English](README_EN.md)
 
@@ -221,7 +221,7 @@ var manager = new CosyVoiceManager
 
 ## 许可证
 
-MIT许可证 - 参见[LICENSE](LICENSE)文件。
+Apache License 2.0 - 参见[LICENSE](LICENSE)文件。
 
 ## 致谢
 

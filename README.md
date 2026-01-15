@@ -3,7 +3,7 @@
 [CosyVoice3](https://github.com/FunAudioLLM/CosyVoice)のテキスト音声合成をUnity AI Interface（Sentis）でONNX推論するUnity実装です。
 
 [![Unity](https://img.shields.io/badge/Unity-6000.0+-black.svg)](https://unity.com/)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 **言語 / Language**: [English](README_EN.md) | [中文](README_CN.md)
 
@@ -221,7 +221,7 @@ CPUバックエンドを使用するか、`MaxTokens`パラメータを減らし
 
 ## ライセンス
 
-MITライセンス - [LICENSE](LICENSE)ファイルを参照。
+Apache License 2.0 - [LICENSE](LICENSE)ファイルを参照。
 
 ## 謝辞
 
