@@ -40,49 +40,89 @@
 
 ## 模型设置
 
-由于体积原因（约3.8GB），ONNX模型文件**未包含**在此仓库中。
+由于体积原因（约4GB），ONNX模型文件**未包含**在此仓库中。
+请从Hugging Face下载。
 
-### 必需模型
+### 下载方法
 
-将以下模型放置在`Assets/Models/`目录：
-
-| 模型 | 大小 | 说明 |
-|------|------|------|
-| `text_embedding_fp32.onnx` | ~580MB | 文本标记嵌入 |
-| `llm_backbone_initial_fp16.onnx` | ~900MB | LLM初始化 |
-| `llm_backbone_decode_fp16.onnx` | ~900MB | LLM解码步骤 |
-| `llm_decoder_fp16.onnx` | ~25MB | LLM输出解码器 |
-| `llm_speech_embedding_fp16.onnx` | ~25MB | 语音标记嵌入 |
-| `flow_token_embedding_fp16.onnx` | ~25MB | Flow标记嵌入 |
-| `flow_pre_lookahead_fp16.onnx` | ~50MB | Flow预处理 |
-| `flow_speaker_projection_fp16.onnx` | ~1MB | 说话人投影 |
-| `flow.decoder.estimator.fp16.onnx` | ~300MB | Flow DiT估计器 |
-| `hift_f0_predictor_fp32.onnx` | ~5MB | F0预测 |
-| `hift_source_generator_fp32.onnx` | ~1MB | 源信号生成 |
-| `hift_decoder_fp32.onnx` | ~50MB | HiFT解码器 |
-
-### 可选模型（用于语音克隆）
-
-| 模型 | 大小 | 说明 |
-|------|------|------|
-| `campplus.onnx` | ~7MB | 说话人编码器（CAM++） |
-| `speech_tokenizer_v3.onnx` | ~100MB | 语音分词器 |
-
-### 分词器文件
-
-放置在`Assets/StreamingAssets/CosyVoice/tokenizer/`：
-- `vocab.json`（~5MB，151,646个标记）
-- `merges.txt`（~3MB，134,839个BPE规则）
-
-### 获取模型
-
-您可以从原始CosyVoice仓库导出模型：
+#### 方法1：Git LFS（推荐）
 
 ```bash
-git clone https://github.com/FunAudioLLM/CosyVoice
-cd CosyVoice
-# 按照ONNX导出说明操作
+# 如果尚未安装Git LFS
+git lfs install
+
+# 克隆仓库
+git clone https://huggingface.co/ayousanz/cosy-voice3-onnx
+
+# 放置文件：
+# ONNX模型 → Assets/Models/
+# vocab.json, merges.txt → Assets/StreamingAssets/CosyVoice/tokenizer/
 ```
+
+#### 方法2：Hugging Face Hub CLI
+
+```bash
+# 安装huggingface_hub
+pip install huggingface_hub
+
+# 下载所有文件
+huggingface-cli download ayousanz/cosy-voice3-onnx --local-dir ./cosy-voice3-onnx
+```
+
+#### 方法3：手动下载
+
+从[Hugging Face仓库](https://huggingface.co/ayousanz/cosy-voice3-onnx/tree/main)直接下载。
+
+### 文件放置
+
+下载后，按以下方式放置文件：
+
+```
+Assets/
+├── Models/                          ← 将ONNX文件放在这里
+│   ├── text_embedding_fp32.onnx
+│   ├── llm_backbone_initial_fp16.onnx
+│   ├── llm_backbone_decode_fp16.onnx
+│   ├── llm_decoder_fp16.onnx
+│   ├── llm_speech_embedding_fp16.onnx
+│   ├── flow_token_embedding_fp16.onnx
+│   ├── flow_pre_lookahead_fp16.onnx
+│   ├── flow_speaker_projection_fp16.onnx
+│   ├── flow.decoder.estimator.fp16.onnx
+│   ├── hift_f0_predictor_fp32.onnx
+│   ├── hift_source_generator_fp32.onnx
+│   ├── hift_decoder_fp32.onnx
+│   ├── campplus.onnx                 （用于语音克隆）
+│   └── speech_tokenizer_v3.onnx      （用于语音克隆）
+└── StreamingAssets/
+    └── CosyVoice/
+        └── tokenizer/               ← 将分词器文件放在这里
+            ├── vocab.json
+            └── merges.txt
+```
+
+### 模型列表
+
+| 模型 | 大小 | 用途 |
+|------|------|------|
+| `text_embedding_fp32.onnx` | 544MB | 文本嵌入 |
+| `llm_backbone_initial_fp16.onnx` | 717MB | LLM初始化 |
+| `llm_backbone_decode_fp16.onnx` | 717MB | LLM解码 |
+| `llm_decoder_fp16.onnx` | 12MB | LLM输出 |
+| `llm_speech_embedding_fp16.onnx` | 12MB | 语音嵌入 |
+| `flow_token_embedding_fp16.onnx` | 1MB | Flow嵌入 |
+| `flow_pre_lookahead_fp16.onnx` | 1MB | Flow预处理 |
+| `flow_speaker_projection_fp16.onnx` | 31KB | 说话人投影 |
+| `flow.decoder.estimator.fp16.onnx` | 664MB | Flow估计器 |
+| `hift_f0_predictor_fp32.onnx` | 13MB | F0预测 |
+| `hift_source_generator_fp32.onnx` | 259MB | 源信号生成 |
+| `hift_decoder_fp32.onnx` | 70MB | HiFT解码器 |
+| `campplus.onnx` | 28MB | 说话人编码器* |
+| `speech_tokenizer_v3.onnx` | 969MB | 语音分词器* |
+| `vocab.json` | 3.5MB | BPE词汇表 |
+| `merges.txt` | 1.5MB | BPE合并规则 |
+
+*仅在使用语音克隆功能时需要
 
 ## 快速开始
 

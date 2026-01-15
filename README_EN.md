@@ -40,49 +40,89 @@ Unity implementation of [CosyVoice3](https://github.com/FunAudioLLM/CosyVoice) t
 
 ## Model Setup
 
-ONNX model files are **not included** in this repository due to size (~3.8GB total).
+ONNX model files are **not included** in this repository due to size (~4GB total).
+Download them from Hugging Face.
 
-### Required Models
+### Download Methods
 
-Place the following models in `Assets/Models/`:
-
-| Model | Size | Description |
-|-------|------|-------------|
-| `text_embedding_fp32.onnx` | ~580MB | Text token embedding |
-| `llm_backbone_initial_fp16.onnx` | ~900MB | LLM initial pass |
-| `llm_backbone_decode_fp16.onnx` | ~900MB | LLM decode step |
-| `llm_decoder_fp16.onnx` | ~25MB | LLM output decoder |
-| `llm_speech_embedding_fp16.onnx` | ~25MB | Speech token embedding |
-| `flow_token_embedding_fp16.onnx` | ~25MB | Flow token embedding |
-| `flow_pre_lookahead_fp16.onnx` | ~50MB | Flow pre-lookahead |
-| `flow_speaker_projection_fp16.onnx` | ~1MB | Speaker projection |
-| `flow.decoder.estimator.fp16.onnx` | ~300MB | Flow DiT estimator |
-| `hift_f0_predictor_fp32.onnx` | ~5MB | F0 prediction |
-| `hift_source_generator_fp32.onnx` | ~1MB | Source signal generation |
-| `hift_decoder_fp32.onnx` | ~50MB | HiFT decoder |
-
-### Optional Models (for Voice Cloning)
-
-| Model | Size | Description |
-|-------|------|-------------|
-| `campplus.onnx` | ~7MB | Speaker encoder (CAM++) |
-| `speech_tokenizer_v3.onnx` | ~100MB | Speech tokenizer |
-
-### Tokenizer Files
-
-Place in `Assets/StreamingAssets/CosyVoice/tokenizer/`:
-- `vocab.json` (~5MB, 151,646 tokens)
-- `merges.txt` (~3MB, 134,839 BPE rules)
-
-### Getting the Models
-
-You can export models from the original CosyVoice repository:
+#### Method 1: Git LFS (Recommended)
 
 ```bash
-git clone https://github.com/FunAudioLLM/CosyVoice
-cd CosyVoice
-# Follow ONNX export instructions
+# Install Git LFS if not already installed
+git lfs install
+
+# Clone the repository
+git clone https://huggingface.co/ayousanz/cosy-voice3-onnx
+
+# Place files:
+# ONNX models → Assets/Models/
+# vocab.json, merges.txt → Assets/StreamingAssets/CosyVoice/tokenizer/
 ```
+
+#### Method 2: Hugging Face Hub CLI
+
+```bash
+# Install huggingface_hub
+pip install huggingface_hub
+
+# Download all files
+huggingface-cli download ayousanz/cosy-voice3-onnx --local-dir ./cosy-voice3-onnx
+```
+
+#### Method 3: Manual Download
+
+Download directly from the [Hugging Face repository](https://huggingface.co/ayousanz/cosy-voice3-onnx/tree/main).
+
+### File Placement
+
+After downloading, place files as follows:
+
+```
+Assets/
+├── Models/                          ← Place ONNX files here
+│   ├── text_embedding_fp32.onnx
+│   ├── llm_backbone_initial_fp16.onnx
+│   ├── llm_backbone_decode_fp16.onnx
+│   ├── llm_decoder_fp16.onnx
+│   ├── llm_speech_embedding_fp16.onnx
+│   ├── flow_token_embedding_fp16.onnx
+│   ├── flow_pre_lookahead_fp16.onnx
+│   ├── flow_speaker_projection_fp16.onnx
+│   ├── flow.decoder.estimator.fp16.onnx
+│   ├── hift_f0_predictor_fp32.onnx
+│   ├── hift_source_generator_fp32.onnx
+│   ├── hift_decoder_fp32.onnx
+│   ├── campplus.onnx                 (for voice cloning)
+│   └── speech_tokenizer_v3.onnx      (for voice cloning)
+└── StreamingAssets/
+    └── CosyVoice/
+        └── tokenizer/               ← Place tokenizer files here
+            ├── vocab.json
+            └── merges.txt
+```
+
+### Model List
+
+| Model | Size | Purpose |
+|-------|------|---------|
+| `text_embedding_fp32.onnx` | 544MB | Text embedding |
+| `llm_backbone_initial_fp16.onnx` | 717MB | LLM initialization |
+| `llm_backbone_decode_fp16.onnx` | 717MB | LLM decoding |
+| `llm_decoder_fp16.onnx` | 12MB | LLM output |
+| `llm_speech_embedding_fp16.onnx` | 12MB | Speech embedding |
+| `flow_token_embedding_fp16.onnx` | 1MB | Flow embedding |
+| `flow_pre_lookahead_fp16.onnx` | 1MB | Flow preprocessing |
+| `flow_speaker_projection_fp16.onnx` | 31KB | Speaker projection |
+| `flow.decoder.estimator.fp16.onnx` | 664MB | Flow estimator |
+| `hift_f0_predictor_fp32.onnx` | 13MB | F0 prediction |
+| `hift_source_generator_fp32.onnx` | 259MB | Source generation |
+| `hift_decoder_fp32.onnx` | 70MB | HiFT decoder |
+| `campplus.onnx` | 28MB | Speaker encoder* |
+| `speech_tokenizer_v3.onnx` | 969MB | Speech tokenizer* |
+| `vocab.json` | 3.5MB | BPE vocabulary |
+| `merges.txt` | 1.5MB | BPE merge rules |
+
+*Required only for voice cloning feature
 
 ## Quick Start
 
