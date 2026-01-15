@@ -61,6 +61,7 @@ tmp*
 
 # ONNX models (too large for git)
 *.onnx
+Assets/Models/*.meta
 
 # uLoop MCP outputs
 .uloop/
