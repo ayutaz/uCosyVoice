@@ -79,6 +79,7 @@ namespace uCosyVoice.Tests.Editor
         #region LLMRunner Model Loading Tests
 
         [Test]
+        [Category("RequiresModels")]
         public void LLMRunner_ModelsExist()
         {
             var textEmbModel = AssetDatabase.LoadAssetAtPath<ModelAsset>(ModelsPath + "text_embedding_fp32.onnx");
@@ -97,6 +98,7 @@ namespace uCosyVoice.Tests.Editor
         }
 
         [Test]
+        [Category("RequiresModels")]
         public void LLMRunner_CanInstantiate()
         {
             var textEmbAsset = AssetDatabase.LoadAssetAtPath<ModelAsset>(ModelsPath + "text_embedding_fp32.onnx");
@@ -133,6 +135,7 @@ namespace uCosyVoice.Tests.Editor
         }
 
         [Test]
+        [Category("RequiresModels")]
         public void LLMRunner_Generate_ProducesTokens()
         {
             var textEmbAsset = AssetDatabase.LoadAssetAtPath<ModelAsset>(ModelsPath + "text_embedding_fp32.onnx");
@@ -196,6 +199,7 @@ namespace uCosyVoice.Tests.Editor
         #region Full Pipeline Integration Test
 
         [Test]
+        [Category("RequiresModels")]
         public void LLM_Flow_HiFT_Integration_ProducesAudio()
         {
             // Load LLM models

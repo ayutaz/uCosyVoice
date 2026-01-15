@@ -75,6 +75,7 @@ namespace uCosyVoice.Tests.Editor
         #region FlowRunner Model Loading Tests
 
         [Test]
+        [Category("RequiresModels")]
         public void FlowRunner_ModelsExist()
         {
             var tokenEmbModel = AssetDatabase.LoadAssetAtPath<ModelAsset>(ModelsPath + "flow_token_embedding_fp16.onnx");
@@ -91,6 +92,7 @@ namespace uCosyVoice.Tests.Editor
         }
 
         [Test]
+        [Category("RequiresModels")]
         public void FlowRunner_CanInstantiate()
         {
             var tokenEmbAsset = AssetDatabase.LoadAssetAtPath<ModelAsset>(ModelsPath + "flow_token_embedding_fp16.onnx");
@@ -116,6 +118,7 @@ namespace uCosyVoice.Tests.Editor
         }
 
         [Test]
+        [Category("RequiresModels")]
         public void FlowRunner_Process_ProducesMel()
         {
             var tokenEmbAsset = AssetDatabase.LoadAssetAtPath<ModelAsset>(ModelsPath + "flow_token_embedding_fp16.onnx");
@@ -172,6 +175,7 @@ namespace uCosyVoice.Tests.Editor
         #region Integration Tests
 
         [Test]
+        [Category("RequiresModels")]
         public void Flow_HiFT_Integration_ProducesAudio()
         {
             // Load Flow models
