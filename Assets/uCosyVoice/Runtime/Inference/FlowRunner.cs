@@ -218,7 +218,7 @@ namespace uCosyVoice.Inference
             var xFinal = xBatch.DownloadToArray();
             xBatch.Dispose();
 
-            // Extract only the generated portion (excluding prompt)
+            // Extract generated portion only (first batch, skip prompt mel frames)
             var melData = new float[MEL_CHANNELS * generatedMelLen];
             for (int c = 0; c < MEL_CHANNELS; c++)
             {
