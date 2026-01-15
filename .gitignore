@@ -58,3 +58,12 @@ crashlytics-build.properties
 
 # Temporary files
 tmp*
+
+# ONNX models (too large for git)
+*.onnx
+
+# uLoop MCP outputs
+.uloop/
+
+# Windows reserved names
+nul

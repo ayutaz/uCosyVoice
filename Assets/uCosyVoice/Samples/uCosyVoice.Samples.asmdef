@@ -1,0 +1,19 @@
+{
+    "name": "uCosyVoice.Samples",
+    "rootNamespace": "uCosyVoice.Samples",
+    "references": [
+        "uCosyVoice.Runtime",
+        "Unity.InferenceEngine",
+        "Unity.TextMeshPro",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
