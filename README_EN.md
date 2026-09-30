@@ -19,7 +19,7 @@ Unity implementation of [CosyVoice3](https://github.com/FunAudioLLM/CosyVoice) t
 - **Zero-shot Voice Cloning**: Clone any voice with just a few seconds of reference audio
 - **Pure C# Implementation**: No Python dependencies at runtime
 - **GPU Acceleration**: Support for both CPU and GPU backends
-- **118 Unit Tests**: Comprehensive test coverage
+- **120 Unit Tests**: Comprehensive test coverage
 
 ## Requirements
 
@@ -32,9 +32,7 @@ Unity implementation of [CosyVoice3](https://github.com/FunAudioLLM/CosyVoice) t
 
 ### Via Unity Package Manager
 
-1. Open Package Manager (Window > Package Manager)
-2. Click "+" and select "Add package from git URL"
-3. Enter: `https://github.com/ayutaz/uCosyVoice.git`
+This repository is a Unity project and does not contain a UPM `package.json`, so it cannot currently be installed with "Add package from git URL". Use the manual installation below.
 
 ### Manual Installation
 
@@ -258,6 +256,8 @@ Currently **English only**. The tokenizer and text normalization are optimized f
 
 ### "Model file not found" Error
 Ensure all ONNX models are placed in `Assets/Models/` directory.
+
+`Assets/Models/` is resolved through `AssetDatabase`, which only works in the Editor. Player builds load models with `Resources.Load`, so for builds place the ONNX models under `Assets/Resources/Models/` instead.
 
 ### GPU Backend Errors
 If you encounter tensor read errors with GPU backend, ensure you're using the latest version which includes proper `DownloadToArray()` calls for GPU compatibility.
