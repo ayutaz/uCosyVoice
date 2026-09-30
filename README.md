@@ -19,7 +19,7 @@
 - **ゼロショット音声クローニング**: 数秒の参照音声で任意の声をクローン
 - **純粋なC#実装**: ランタイムでPython依存なし
 - **GPU高速化**: CPUとGPUバックエンドの両方をサポート
-- **118のユニットテスト**: 包括的なテストカバレッジ
+- **120のユニットテスト**: 包括的なテストカバレッジ
 
 ## 要件
 
@@ -32,9 +32,7 @@
 
 ### Unity Package Manager経由
 
-1. Package Managerを開く（Window > Package Manager）
-2. 「+」をクリックして「Add package from git URL」を選択
-3. 入力: `https://github.com/ayutaz/uCosyVoice.git`
+このリポジトリはUnityプロジェクト構成で、UPM用の`package.json`を含まないため、現状「Add package from git URL」ではインストールできません。下記の手動インストールを利用してください。
 
 ### 手動インストール
 
@@ -258,6 +256,8 @@ var manager = new CosyVoiceManager
 
 ### 「Model file not found」エラー
 すべてのONNXモデルが`Assets/Models/`ディレクトリに配置されていることを確認してください。
+
+`Assets/Models/`は`AssetDatabase`経由で読み込まれるため、Editor上でのみ有効です。ビルド（Player）では`Resources.Load`で読み込むため、ビルド時はONNXモデルを`Assets/Resources/Models/`に配置してください。
 
 ### GPUバックエンドエラー
 GPUバックエンドでテンソル読み取りエラーが発生する場合は、GPU互換性のための適切な`DownloadToArray()`呼び出しを含む最新バージョンを使用していることを確認してください。

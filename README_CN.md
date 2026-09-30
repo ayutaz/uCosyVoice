@@ -19,7 +19,7 @@
 - **零样本语音克隆**：仅需几秒钟的参考音频即可克隆任意声音
 - **纯C#实现**：运行时无Python依赖
 - **GPU加速**：支持CPU和GPU后端
-- **118个单元测试**：全面的测试覆盖
+- **120个单元测试**：全面的测试覆盖
 
 ## 要求
 
@@ -32,9 +32,7 @@
 
 ### 通过Unity Package Manager
 
-1. 打开Package Manager（Window > Package Manager）
-2. 点击"+"并选择"Add package from git URL"
-3. 输入：`https://github.com/ayutaz/uCosyVoice.git`
+本仓库是Unity项目结构，不包含UPM所需的`package.json`，因此目前无法通过"Add package from git URL"安装。请使用下方的手动安装。
 
 ### 手动安装
 
@@ -258,6 +256,8 @@ var manager = new CosyVoiceManager
 
 ### "Model file not found"错误
 确保所有ONNX模型都放置在`Assets/Models/`目录中。
+
+`Assets/Models/`通过`AssetDatabase`加载，仅在Editor中有效。构建（Player）时使用`Resources.Load`加载模型，因此构建时请将ONNX模型放置在`Assets/Resources/Models/`中。
 
 ### GPU后端错误
 如果在GPU后端遇到张量读取错误，请确保使用包含正确`DownloadToArray()`调用的最新版本以确保GPU兼容性。
